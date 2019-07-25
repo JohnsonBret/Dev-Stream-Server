@@ -1,17 +1,20 @@
 var express = require('express');
 var {mongoose} = require('./db/mongoose');
-
 var {Person} = require('./models/person'); 
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
 var bodyParser = require('body-parser'); 
 var path = require('path');
+
+const hbs = require('hbs'); 
+
 var app = express();
 
 app.use(bodyParser.json());  
 app.use(bodyParser.urlencoded({ extended: true })); 
 
 app.use(express.static(__dirname + "/public"));
+app.set('view engine', 'hbs');
 
 //TODO ADD THIS
 mongoose.set('useCreateIndex', true);
@@ -32,6 +35,14 @@ app.get('/about', authenticate, (req, res)=>{
     }
     
 });
+
+app.get('/person', async (req, res)=>{
+    res.render('person.hbs', {
+        name: "Alan Turing",
+        age: 107,
+        isFun: true
+    }); 
+}); 
 
 app.post('/person', async (req, res)=>{
 
