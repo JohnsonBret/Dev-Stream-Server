@@ -16,10 +16,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
 app.set('view engine', 'hbs');
 
-//TODO ADD THIS
 mongoose.set('useCreateIndex', true);
 
-const port = 8000;
+const port = process.env.PORT || 8000; 
 
 app.get('/', (req, res)=>{
     //res.send({response: "Hello UCode Developer", port: 8000});
@@ -36,12 +35,24 @@ app.get('/about', authenticate, (req, res)=>{
     
 });
 
-app.get('/person', async (req, res)=>{
-    res.render('person.hbs', {
-        name: "Alan Turing",
-        age: 107,
-        isFun: true
-    }); 
+app.get('/person/:name', async (req, res)=>{ 
+
+    console.log(req.params.name); 
+
+    try {
+        const foundPerson = await Person.find({name: req.params.name}); 
+        
+        console.log(foundPerson); 
+
+        res.render('person.hbs', {
+            name: foundPerson[0].name,
+            age: foundPerson[0].age,
+            isFun: foundPerson[0].isFun
+        }); 
+
+    } catch (error) {
+        res.status(404).send(`<h2> No person with the name ${req.params.name} found.</h2>`);
+    } 
 }); 
 
 app.post('/person', async (req, res)=>{
